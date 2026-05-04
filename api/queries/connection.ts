@@ -1,0 +1,27 @@
+import { Pool } from "pg";
+import { drizzle } from "drizzle-orm/node-postgres";
+import { env } from "../lib/env";
+import * as schema from "@db/schema";
+import * as relations from "@db/relations";
+
+const fullSchema = { ...schema, ...relations };
+
+let instance: ReturnType<typeof drizzle<typeof fullSchema>>;
+
+export function getDb() {
+  if (!instance) {
+    const pool = new Pool({
+      connectionString: env.databaseUrl,
+      ...(env.databaseUrl.includes("sslmode=require") ||
+      env.databaseUrl.includes("ssl=true") ||
+      env.databaseUrl.includes(".supabase.co")
+        ? { ssl: { rejectUnauthorized: false } }
+        : {}),
+    });
+
+    instance = drizzle(pool, {
+      schema: fullSchema,
+    });
+  }
+  return instance;
+}
