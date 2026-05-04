@@ -37,6 +37,7 @@ build
 *.sqlite
 *.sqlite3
 db/migrations/*.sql
+db/migrations/meta/
 
 # TypeScript cache
 *.tsbuildinfo
